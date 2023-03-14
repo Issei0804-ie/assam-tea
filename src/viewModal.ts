@@ -5,6 +5,8 @@ export class ModalData {
 	labels: string[];
 	data: number[];
 	chartLabel: string;
+	yTicksLabel = "m";
+
 
 	constructor() {
 		this.data = [];
@@ -18,9 +20,15 @@ export class ModalData {
 		});
 		if (!oneHourOrMore) return this.data;
 
+		this.yTicksLabel = "h";
+
 		return this.data.map((value) => {
-			return value / 60;
+			return (value / 60);
 		})
+	}
+
+	getYTicsLabel(): string {
+		return this.yTicksLabel;
 	}
 }
 
@@ -30,6 +38,7 @@ export class ViewModal extends Modal {
 	constructor(app: App, data: ModalData) {
 		super(app);
 		this.data = data;
+		console.log(this.data.getYTicsLabel());
 	}
 
 	onOpen() {
@@ -49,14 +58,17 @@ export class ViewModal extends Modal {
 			options: {
 				scales: {
 					y: {
+						ticks: {
+							callback: (value, index, values) => {
+								return value + this.data.getYTicsLabel();
+							}
+						},
 						beginAtZero: true
 					}
 				}
 			}
 		});
-
 		chart.draw();
-
 	}
 
 	onClose() {
