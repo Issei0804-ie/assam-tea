@@ -1,4 +1,14 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import {App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, WorkspaceLeaf} from 'obsidian';
+import {forEach} from "builtin-modules";
+import {
+	isTimeAndCategory,
+	getTimeAndCategory,
+	STARTING_WORK_TIME_IDX,
+	ENDING_WORK_TIME_IDX,
+	CATEGORY_IDX,
+	getDate
+} from "./src/graph";
+import {ModalData, ViewModal} from "./src/viewModal";
 
 // Remember to rename these classes and interfaces!
 
@@ -26,14 +36,30 @@ export default class MyPlugin extends Plugin {
 
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
 		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
+		statusBarItemEl.setText('Status Bar Text, sample');
 
 		// This adds a simple command that can be triggered anywhere
 		this.addCommand({
-			id: 'open-sample-modal-simple',
-			name: 'Open sample modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
+			id: 'assam-tea-view',
+			name: 'Open pie chart',
+			editorCallback: (editor: Editor, view:MarkdownView) => {
+				console.log("eiya");
+				const doc = editor.getDoc();
+				const data = new ModalData();
+				data.chartLabel = "sample";
+				for(let i=0; i<doc.lineCount(); i++){
+					const line = doc.getLine(i).trim();
+					if (isTimeAndCategory(line)){
+						const timeAndCategory = getTimeAndCategory(line);
+						const startingWorkTime = getDate(timeAndCategory[STARTING_WORK_TIME_IDX]);
+						const endingWorkTime = getDate(timeAndCategory[ENDING_WORK_TIME_IDX]);
+						const category = timeAndCategory[CATEGORY_IDX];
+						const workTimeMin = (endingWorkTime.getTime() - startingWorkTime.getTime()) / (1000*60);
+						data.labels.push(category);
+						data.data.push(workTimeMin);
+					}
+				}
+				new ViewModal(this.app, data).open();
 			}
 		});
 		// This adds an editor command that can perform some operation on the current editor instance
@@ -45,25 +71,36 @@ export default class MyPlugin extends Plugin {
 				editor.replaceSelection('Sample Editor Command');
 			}
 		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
 
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
+		this.addCommand({
+			id: 'assam-tea-timestamp',
+			name: 'Timestamp をえいやー',
+			editorCallback: (editor: Editor, view:MarkdownView)=> {
+				const date = new Date();
+				const timestamp = `#### ${date.getHours()}:${date.getMinutes()}\n`
+				editor.replaceSelection(timestamp);
 			}
 		});
+
+		// This adds a complex command that can check whether the current state of the app allows execution of the command
+		// this.addCommand({
+		// 	id: 'open-sample-modal-complex',
+		// 	name: 'Open sample modal (complex)',
+		// 	checkCallback: (checking: boolean) => {
+		// 		// Conditions to check
+		// 		const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+		// 		if (markdownView) {
+		// 			// If checking is true, we're simply "checking" if the command can be run.
+		// 			// If checking is false, then we want to actually perform the operation.
+		// 			if (!checking) {
+		// 				new SampleModal(this.app).open();
+		// 			}
+		//
+		// 			// This command will only show up in Command Palette when the check function returns true
+		// 			return true;
+		// 		}
+		// 	}
+		// });
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
@@ -91,21 +128,7 @@ export default class MyPlugin extends Plugin {
 	}
 }
 
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
 
-	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
-}
 
 class SampleSettingTab extends PluginSettingTab {
 	plugin: MyPlugin;
