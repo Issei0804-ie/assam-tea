@@ -47,6 +47,7 @@ export default class MyPlugin extends Plugin {
 				const doc = editor.getDoc();
 				const data = new ModalData();
 				data.chartLabel = "sample";
+				// this.app.vault.getMarkdownFiles();
 				for(let i=0; i<doc.lineCount(); i++){
 					const line = doc.getLine(i).trim();
 					if (isTimeAndCategory(line)){
