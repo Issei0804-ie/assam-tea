@@ -1,14 +1,14 @@
-import {App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, WorkspaceLeaf} from 'obsidian';
-import {forEach} from "builtin-modules";
+import {App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting} from 'obsidian';
 import {
-	isTimeAndCategory,
-	getTimeAndCategory,
-	STARTING_WORK_TIME_IDX,
-	ENDING_WORK_TIME_IDX,
 	CATEGORY_IDX,
-	getDate
+	ENDING_WORK_TIME_IDX,
+	getDate,
+	getTimeAndCategory,
+	isTimeAndCategory,
+	STARTING_WORK_TIME_IDX
 } from "./src/graph";
 import {ModalData, ViewModal} from "./src/viewModal";
+
 
 // Remember to rename these classes and interfaces!
 
