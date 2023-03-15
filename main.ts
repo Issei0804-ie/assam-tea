@@ -78,7 +78,7 @@ export default class MyPlugin extends Plugin {
 			name: 'Timestamp をえいやー',
 			editorCallback: (editor: Editor, view:MarkdownView)=> {
 				const date = new Date();
-				const timestamp = `#### ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes()}\n`
+				const timestamp = `#### ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}\n`
 				editor.replaceSelection(timestamp);
 			}
 		});
