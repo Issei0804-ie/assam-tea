@@ -42,20 +42,20 @@ export default class MyPlugin extends Plugin {
 		this.addCommand({
 			id: 'assam-tea-view',
 			name: 'Open pie chart',
-			editorCallback: (editor: Editor, view:MarkdownView) => {
+			editorCallback: (editor: Editor, view: MarkdownView) => {
 				console.log("eiya");
 				const doc = editor.getDoc();
 				const data = new ModalData();
 				data.chartLabel = "sample";
 				// this.app.vault.getMarkdownFiles();
-				for(let i=0; i<doc.lineCount(); i++){
+				for (let i = 0; i < doc.lineCount(); i++) {
 					const line = doc.getLine(i).trim();
-					if (isTimeAndCategory(line)){
+					if (isTimeAndCategory(line)) {
 						const timeAndCategory = getTimeAndCategory(line);
 						const startingWorkTime = getDate(timeAndCategory[STARTING_WORK_TIME_IDX]);
 						const endingWorkTime = getDate(timeAndCategory[ENDING_WORK_TIME_IDX]);
 						const category = timeAndCategory[CATEGORY_IDX];
-						const workTimeMin = (endingWorkTime.getTime() - startingWorkTime.getTime()) / (1000*60);
+						const workTimeMin = (endingWorkTime.getTime() - startingWorkTime.getTime()) / (1000 * 60);
 						data.labels.push(category);
 						data.data.push(workTimeMin);
 					}
@@ -74,11 +74,21 @@ export default class MyPlugin extends Plugin {
 		});
 
 		this.addCommand({
+			id: 'assam-tea-timestamp-for-worktime',
+			name: '#が4つついたTimestamp をえいやー',
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				const date = new Date();
+				const timestamp = `#### ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')} -`
+				editor.replaceSelection(timestamp);
+			}
+		});
+
+		this.addCommand({
 			id: 'assam-tea-timestamp',
 			name: 'Timestamp をえいやー',
-			editorCallback: (editor: Editor, view:MarkdownView)=> {
+			editorCallback: (editor: Editor, view: MarkdownView) => {
 				const date = new Date();
-				const timestamp = `#### ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}\n`
+				const timestamp = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
 				editor.replaceSelection(timestamp);
 			}
 		});
@@ -128,7 +138,6 @@ export default class MyPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 }
-
 
 
 class SampleSettingTab extends PluginSettingTab {
