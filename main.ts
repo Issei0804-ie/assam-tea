@@ -77,9 +77,27 @@ export default class MyPlugin extends Plugin {
 			id: 'assam-tea-timestamp-for-worktime',
 			name: '#が4つついたTimestamp をえいやー',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
+
+				const doc = editor.getDoc();
 				const date = new Date();
-				const timestamp = `#### ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')} -`
-				editor.replaceSelection(timestamp);
+				let doTimeStamp = false;
+
+				for (let i = 0; i < doc.lineCount(); i++) {
+					const line = doc.getLine(i).trim();
+					if (isTimeAndCategory(line)) {
+						const timeAndCategory = getTimeAndCategory(line);
+						const endingWorkTime = getDate(timeAndCategory[ENDING_WORK_TIME_IDX]);
+						const timestamp = `#### ${endingWorkTime.getHours().toString().padStart(2, '0')}:${endingWorkTime.getMinutes().toString().padStart(2, '0')} -`
+						editor.replaceSelection(timestamp);
+						doTimeStamp = true;
+						break;
+					}
+				}
+
+				if (!doTimeStamp){
+					const timestamp = `#### ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')} -`
+					editor.replaceSelection(timestamp);
+				}
 			}
 		});
 
