@@ -1,81 +1,19 @@
-name: Build obsidian plugin
-
 on:
-  push:
-    tags:
-      - "*"
-
-env:
-  PLUGIN_NAME: obsidian-work-time-view-plugin
+  pull_request:
+    types: [opened, synchronize]
 
 jobs:
-  build:
+  hello_world_job:
     runs-on: ubuntu-latest
+    name: ChatGPT explain code
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js
-        uses: actions/setup-node@v1
+      - name: ChatGTP explain code
+        uses: cirolini/chatgpt-github-actions@v1.3
         with:
-          node-version: '15.x'
-
-      - name: Build
-        id: build
-        run: |
-          npm install
-          npm run build
-          mkdir ${{ env.PLUGIN_NAME }}
-          cp main.js manifest.json ${{ env.PLUGIN_NAME }}
-          zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
-          ls
-          echo "::set-output name=tag_name::$(git tag --sort version:refname | tail -n 1)"
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            VERSION: ${{ github.ref }}
-        with:
-            tag_name: ${{ github.ref }}
-            release_name: ${{ github.ref }}
-            draft: false
-            prerelease: false
-      - name: Upload zip file
-        id: upload-zip
-        uses: actions/upload-release-asset@v1
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: ./${{ env.PLUGIN_NAME }}.zip
-            asset_name: ${{ env.PLUGIN_NAME }}-${{ steps.build.outputs.tag_name }}.zip
-            asset_content_type: application/zip
-      - name: Upload main.js
-        id: upload-main
-        uses: actions/upload-release-asset@v1
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: ./main.js
-            asset_name: main.js
-            asset_content_type: text/javascript
-      - name: Upload manifest.json
-        id: upload-manifest
-        uses: actions/upload-release-asset@v1
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: ./manifest.json
-            asset_name: manifest.json
-            asset_content_type: application/json
-      - name: Upload styles.css
-        id: upload-css
-        uses: actions/upload-release-asset@v1
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: ./styles.css
-            asset_name: styles.css
-            asset_content_type: text/css
+          openai_api_key: ${{ secrets.openai_api_key }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_pr_id: ${{ github.event.number }}
+          openai_engine: "text-davinci-002" #optional
+          openai_temperature: 0.5 #optional
+          openai_max_tokens: 2048 #optional
+          mode: file # file or patch 
